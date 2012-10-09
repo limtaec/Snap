@@ -4,7 +4,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="10"
         android:targetSdkVersion="15" />
 
     <application
@@ -16,11 +16,12 @@
             android:label="@string/title_activity_setting" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="GestureRecognizeService"></service>
+
+        <service android:name="GestureRecognizeService" >
+        </service>
     </application>
 
 </manifest>

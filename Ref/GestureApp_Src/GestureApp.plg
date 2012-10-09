@@ -1,0 +1,70 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: GestureApp - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "midl.exe /nologo /D "NDEBUG" /tlb "Release/GESTUREAPP.tlb" /mktyplib203 /win32 "D:\Kot\Coding\Freeware\GestureApp\GESTUREAPP.idl""
+Creating command line "rc.exe /l 0x409 /fo"Release/GestureApp.res" /d "NDEBUG" "D:\Kot\Coding\Freeware\GestureApp\GestureApp.rc"" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP42.tmp" with contents
+[
+/nologo /G5 /MT /W3 /GX /Zi /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_WIN32_DCOM" /Fp"Release/GestureApp.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\Kot\Coding\Freeware\GestureApp\Board.cpp"
+"D:\Kot\Coding\Freeware\GestureApp\GESTUREAPP.cpp"
+"D:\Kot\Coding\Freeware\GestureApp\Main.cpp"
+"D:\Kot\Coding\Freeware\GestureApp\MLNet.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP42.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP43.tmp" with contents
+[
+/nologo /G5 /MT /W3 /GX /Zi /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_WIN32_DCOM" /Fp"Release/GestureApp.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\Kot\Coding\Freeware\GestureApp\stdafx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP43.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP44.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/GestureApp.pdb" /map:"Release/GestureApp.map" /debug /machine:I386 /out:".\GestureApp.exe" /OPT:REF /OPT:ICF,7 /OPT:NOWIN98 
+.\Release\Board.obj
+.\Release\GESTUREAPP.obj
+.\Release\Main.obj
+.\Release\stdafx.obj
+.\Release\MLNet.obj
+.\Release\GestureApp.res
+]
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP44.tmp"
+<h3>Output Window</h3>
+Creating Type Library...
+Processing D:\Kot\Coding\Freeware\GestureApp\GESTUREAPP.idl
+GESTUREAPP.idl
+Processing D:\MsSDK\include\oaidl.idl
+oaidl.idl
+Processing D:\MsSDK\include\objidl.idl
+objidl.idl
+Processing D:\MsSDK\include\unknwn.idl
+unknwn.idl
+Processing D:\MsSDK\include\wtypes.idl
+wtypes.idl
+Processing D:\DxSDK\include\basetsd.h
+basetsd.h
+Processing D:\MsSDK\include\guiddef.h
+guiddef.h
+Compiling resources...
+Compiling...
+stdafx.cpp
+Compiling...
+Board.cpp
+GESTUREAPP.cpp
+Main.cpp
+MLNet.cpp
+Generating Code...
+Linking...
+
+
+
+<h3>Results</h3>
+GestureApp.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

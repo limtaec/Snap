@@ -1,0 +1,250 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Russian resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+#ifdef _WIN32
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 166, 220
+STYLE DS_CENTER | WS_POPUP | WS_BORDER
+FONT 8, "MS Sans Serif"
+BEGIN
+    CTEXT           "GestureApp v.1.0.\nExample of use of a feedforward neural network (two layers percepton) for gesture recognition\nFreeware\n(c) Copyright 2001\n Author Konstantin Boukreev\nkonstantin@mail.primorye.ru",
+                    IDC_STATIC1,4,108,155,56,0,WS_EX_TRANSPARENT
+    LTEXT           "Thanks a lot:\n - My wife Julia for her nice artwork ;)",
+                    IDC_STATIC2,4,174,155,18
+    LTEXT           "",IDC_LOGO,5,2,155,100,0,WS_EX_TRANSPARENT
+    LTEXT           "Partial Copyright:\n - Pedro Pombeiro, selection slider code",
+                    IDC_STATIC3,4,196,155,19
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        RIGHTMARGIN, 165
+        BOTTOMMARGIN, 145
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Russian resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_MAIN DIALOGEX 0, 0, 326, 159
+STYLE DS_CENTER | WS_MINIMIZEBOX | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | 
+    WS_THICKFRAME
+EXSTYLE WS_EX_CONTROLPARENT
+CAPTION "GestureApp by Konstantin Boukreev"
+MENU IDR_MENU1
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_BOARD,"Button",BS_OWNERDRAW | BS_FLAT,0,0,325,159
+END
+
+IDD_CUSTOMIZE DIALOG DISCARDABLE  0, 0, 191, 121
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Customize test"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "&Use only selected patterns",IDC_CHECK_ALL,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,6,6,99,10
+    LISTBOX         IDC_LIST_PATTERN,5,19,115,71,LBS_MULTIPLESEL | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&Speed",IDC_STATIC,131,6,49,8
+    CONTROL         "Slider1",IDC_SLIDER_SPEED,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,125,19,59,15
+    LTEXT           "&Noise",IDC_STATIC,130,36,45,8
+    CONTROL         "Slider1",IDC_SLIDER_NOISE,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,125,46,59,15
+    LTEXT           "&Repeat:",IDC_STATIC,130,64,30,8
+    EDITTEXT        IDC_EDIT_REPEAT,130,75,50,14,ES_AUTOHSCROLL
+    CONTROL         "Spin1",IDC_SPIN_REPEAT,"msctls_updown32",
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS | UDS_NOTHOUSANDS,180,75,11,14
+    DEFPUSHBUTTON   "OK",IDOK,46,101,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,100,101,50,14
+END
+
+IDD_TRAINOPT DIALOG DISCARDABLE  0, 0, 217, 151
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Training's Options"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Max &Cycles",IDC_STATIC,10,7,39,8
+    EDITTEXT        IDC_EDIT_CYCLES,60,5,60,14,ES_AUTOHSCROLL
+    CONTROL         "Spin1",IDC_SPIN_CYCLES,"msctls_updown32",
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS,120,5,11,14
+    LTEXT           "&Momentum, 0.0 .. 1.0",IDC_STATIC,10,33,70,8
+    CONTROL         "Slider1",IDC_SLIDER_MOMENTUM,"msctls_trackbar32",
+                    TBS_AUTOTICKS | WS_TABSTOP,5,45,125,23
+    LTEXT           "Minimum E&rror, 0.0 .. 0.1",IDC_STATIC,10,71,90,8
+    CONTROL         "Slider1",IDC_SLIDER_ERROR,"msctls_trackbar32",
+                    TBS_AUTOTICKS | WS_TABSTOP,5,81,125,23
+    LTEXT           "&Learning's Rate, 0.0 .. 1.0, \nselect range (press shift)",
+                    IDC_STATIC,10,109,110,16
+    CONTROL         "Slider1",IDC_SLIDER_RATE,"msctls_trackbar32",
+                    TBS_AUTOTICKS | TBS_ENABLESELRANGE | WS_TABSTOP,5,127,
+                    125,23
+    DEFPUSHBUTTON   "OK",IDOK,160,5,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,160,22,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_MAIN, DIALOG
+    BEGIN
+        RIGHTMARGIN, 204
+        BOTTOMMARGIN, 120
+    END
+
+    IDD_CUSTOMIZE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 184
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 114
+    END
+
+    IDD_TRAINOPT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 210
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 144
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU DISCARDABLE 
+BEGIN
+    POPUP "File"
+    BEGIN
+        MENUITEM "&Open...",                    ID_FILEOPEN
+        MENUITEM "&Save",                       ID_FILESAVE
+        MENUITEM "Save &As...",                 ID_FILESAVEAS
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "Neural Net"
+    BEGIN
+        MENUITEM "&Train...",                   ID_TRAIN
+        MENUITEM "&Stop",                       ID_STOP
+        MENUITEM "T&est...",                    ID_TEST
+        MENUITEM SEPARATOR
+        MENUITEM "&Recognize",                  ID_RECOGNIZE
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&Help...",                    ID_HELP
+        MENUITEM "&About...",                   ID_APP_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "&Email to Author",            ID_APP_EMAIL
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_JPEG
+//
+
+IDR_RT_JPEG1            RT_JPEG DISCARDABLE     "Res\\b1.jpg"
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
