@@ -1,8 +1,9 @@
 <resources>
 
     <string name="app_name">Snap</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="menu_settings">Settings</string>
-    <string name="title_activity_setting">SettingActivity</string>
+    <string name="list_empty">List Empty</string>
+    <string name="setting">Snap Settings</string>
+    <string name="text_empty"> </string>
+    <string name="gesture_learn">Gesture Learning</string>
 
 </resources>

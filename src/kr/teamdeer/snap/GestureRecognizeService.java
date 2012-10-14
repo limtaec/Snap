@@ -3,8 +3,11 @@ package kr.teamdeer.snap;
 import java.util.List;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.hardware.Sensor;
@@ -13,31 +16,42 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
 public class GestureRecognizeService extends Service implements SensorEventListener, Runnable {
 
 	private Handler mHandler;
+	private WakeLock mWakeLock;
 	private SensorManager mSensorMgr;
 	
 	@Override
 	public void onCreate() {
-		Log.e("GestureRecognizeService", "Service Created");
+		Log.d("GestureRecognizeService", "Service Created");
 		super.onCreate();
 		mHandler = new Handler();
 		mSensorMgr = (SensorManager)getSystemService(SENSOR_SERVICE);
+		PowerManager manager =
+	            (PowerManager) getSystemService(Context.POWER_SERVICE);
+		mWakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, this.getClass().getName());
+        this.registerReceiver(mReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
 	}
 	
 	@Override
 	public void onDestroy() {
-		Log.e("GestureRecognizeService", "Service Destroyed");
+		Log.d("GestureRecognizeService", "Service Destroyed");
+		unregisterReceiver(mReceiver);
+        unregisterListener();
+        mWakeLock.release();
 		super.onDestroy();
 	}
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.e("GestureRecognizeService", "Service Started");
-		//TODO Sensor Init
+		Log.d("GestureRecognizeService", "Service Started");
+		registerListener();
+        mWakeLock.acquire();
 		mHandler.postDelayed(this, 300);
 		return START_STICKY;
 	}
@@ -48,8 +62,61 @@ public class GestureRecognizeService extends Service implements SensorEventListe
 	}
 	
 	public void onSensorChanged(SensorEvent event) {
-		
+		Log.d("GestureRecognizeService", "sensor: " + event.sensor + ", x: " + event.values[0] + ", y: " + event.values[1] + ", z: " + event.values[2]);
+        synchronized (this) { /*
+            if (mBitmap != null) {
+                final Canvas canvas = mCanvas;
+                final Paint paint = mPaint;
+                float newX = mLastX + mSpeed;
+                    
+                int j = (event.sensor.getType() == Sensor.TYPE_ORIENTATION) ? 1 : 0;
+                for (int i=0 ; i<3 ; i++) {
+                	int k = i+j*3;
+                    final float v = mYOffset + event.values[i] * ( j==1 ? 1 : mScale );
+                    paint.setColor(mColors[k]);
+                    canvas.drawLine(mLastX, mLastValues[k], newX, v, paint);
+                    mLastValues[k] = v;
+                }
+                    
+                if (event.sensor.getType() == Sensor.TYPE_ORIENTATION)
+                	mLastX += mSpeed;
+                invalidate();
+            } */
+        }
 	}
+	
+	private void registerListener() {
+		mSensorMgr.registerListener(this,
+				mSensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_NORMAL);
+		mSensorMgr.registerListener(this, 
+				mSensorMgr.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                SensorManager.SENSOR_DELAY_NORMAL);
+    }
+	
+	private void unregisterListener() {
+		mSensorMgr.unregisterListener(this);
+    }
+	
+	public BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i("ACTIVITY", "onReceive("+intent+")");
+            
+            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+            	Runnable runnable = new Runnable() {
+                    public void run() {
+                        Log.i("ACTIVITY", "Runnable executing.");
+                        unregisterListener();
+                        registerListener();
+                    }
+                };
+
+                new Handler().postDelayed(runnable, 500);
+                return;
+            }
+        }
+    };
 	
 	public void RunActivity(String pkgName, String name)
 	{
@@ -86,8 +153,8 @@ public class GestureRecognizeService extends Service implements SensorEventListe
         }
 	}
 	
-	public native long NeuralNetRecognize();
-	public native long BoxCollisionRecognize();
+	public native long NeuralNetRecognize(GestureData gData, GestureElement recvData);
+	public native long BoxCollisionRecognize(GestureData gData, GestureElement recvData);
 	
 	static {
 		System.loadLibrary("Snap");
