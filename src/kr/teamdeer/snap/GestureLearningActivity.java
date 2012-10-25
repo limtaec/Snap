@@ -18,118 +18,31 @@
 
 package kr.teamdeer.snap;
 
+import java.util.List;
+
+import kr.teamdeer.snap.RangeSeekBar.OnRangeSeekBarChangeListener;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.View;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.Toast;
 
 public class GestureLearningActivity extends Activity {
-    private SensorManager mSensorManager;
-    private GraphView mGraphView;
-
-    private class GraphView extends View implements SensorEventListener
-    {
-        private Bitmap  mBitmap;
-        private Paint   mPaint = new Paint();
-        private Canvas  mCanvas = new Canvas();
-        private float   mLastValues[] = new float[3*2];
-        private int     mColors[] = new int[3*2];
-        private float   mLastX;
-        private float   mScale;
-        private float   mYOffset;
-        private float   mMaxX;
-        private float   mSpeed = 1.0f;
-        private float   mWidth;
-        private float   mHeight;
-        
-        public GraphView(Context context) {
-            super(context);
-            mColors[0] = Color.argb(192, 255, 64, 64);
-            mColors[1] = Color.argb(192, 64, 128, 64);
-            mColors[2] = Color.argb(192, 64, 64, 255);
-            mColors[3] = Color.argb(192, 64, 255, 255);
-            mColors[4] = Color.argb(192, 128, 64, 128);
-            mColors[5] = Color.argb(192, 255, 255, 64);
-            
-            mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        }
-        
-        @Override
-        protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-            mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.RGB_565);
-            mCanvas.setBitmap(mBitmap);
-            mCanvas.drawColor(0xFF000000);
-            mYOffset = h * 0.5f;
-            mScale = - (h * 0.5f * (1.0f / (SensorManager.STANDARD_GRAVITY * 2)));
-            mWidth = w;
-            mHeight = h;
-            if (mWidth < mHeight) {
-                mMaxX = w;
-            } else {
-                mMaxX = w-50;
-            }
-            mLastX = mMaxX;
-            super.onSizeChanged(w, h, oldw, oldh);
-        }
-
-        @Override
-        protected void onDraw(Canvas canvas) {
-            synchronized (this) {
-                if (mBitmap != null) {
-                    final Paint paint = mPaint;
-
-                    if (mLastX >= mMaxX) {
-                        mLastX = 0;
-                        final Canvas cavas = mCanvas;
-                        final float yoffset = mYOffset;
-                        final float maxx = mMaxX;
-                        final float oneG = SensorManager.STANDARD_GRAVITY * mScale;
-                        paint.setColor(0xFFFFFFFF);
-                        cavas.drawColor(0xFF000000);
-                        cavas.drawLine(0, yoffset,      maxx, yoffset,      paint);
-                        cavas.drawLine(0, yoffset+oneG, maxx, yoffset+oneG, paint);
-                        cavas.drawLine(0, yoffset-oneG, maxx, yoffset-oneG, paint);
-                    }
-                    canvas.drawBitmap(mBitmap, 0, 0, null);
-                }
-            }
-        }
-
-        public void onSensorChanged(SensorEvent event) {
-            //Log.i(TAG, "sensor: " + sensor + ", x: " + values[0] + ", y: " + values[1] + ", z: " + values[2]);
-            synchronized (this) {
-                if (mBitmap != null) {
-                    final Canvas canvas = mCanvas;
-                    final Paint paint = mPaint;
-                    float newX = mLastX + mSpeed;
-                        
-                    int j = (event.sensor.getType() == Sensor.TYPE_ORIENTATION) ? 1 : 0;
-                    for (int i=0 ; i<3 ; i++) {
-                    	int k = i+j*3;
-                        final float v = mYOffset + event.values[i] * ( j==1 ? 1 : mScale );
-                        paint.setColor(mColors[k]);
-                        canvas.drawLine(mLastX, mLastValues[k], newX, v, paint);
-                        mLastValues[k] = v;
-                    }
-                        
-                    if (event.sensor.getType() == Sensor.TYPE_ORIENTATION)
-                    	mLastX += mSpeed;
-                    invalidate();
-                }
-            }
-        }
-
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {}
-    }
+    private SensorManager mSensorManager;    
+    private GestureGraphView mGraphView;
+	private RangeSeekBar mSeekBar;
+	private Button mResetButton;
+	private Button mSubmitButton;
+	private GestureElement mNewData;
+	private GestureEditDialog gedlg;
+	private Context context;
     
     /**
      * Initialization of the Activity after it is first created.  Must at least
@@ -140,11 +53,95 @@ public class GestureLearningActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         // Be sure to call the super class.
         super.onCreate(savedInstanceState);
-
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        mGraphView = new GraphView(this);
-        setContentView(mGraphView);
+        setContentView(R.layout.new_gesture);
+        mGraphView = (GestureGraphView)findViewById(R.id.gestureGraphView);
+        mSeekBar = (RangeSeekBar)findViewById(R.id.rangeSeekBar);
+        mSeekBar.initFormCode(0.0f, 30.0f);
+        mSeekBar.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener() {
+			@Override
+			public void onRangeSeekBarValuesChanged(RangeSeekBar bar,
+					float minValue, float maxValue) {
+				mGraphView.mStop = true;
+				mGraphView.mEditMode = true;
+				mGraphView.mRangeL = minValue;
+				mGraphView.mRangeR = maxValue;
+				mGraphView.Refresh();
+			}
+        });
+        mResetButton = (Button)findViewById(R.id.learnResetBtn);
+        mResetButton.setOnClickListener(resetBtnListener);
+        mSubmitButton = (Button)findViewById(R.id.learnSubmitButton);
+        mSubmitButton.setOnClickListener(submitBtnListener);
+        mNewData = new GestureElement();
+        context = this;
     }
+    
+    private OnClickListener resetBtnListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			mGraphView.mRecordedDataAcc.clear();
+			mGraphView.mRecordedDataOri.clear();
+			mGraphView.mEditMode = false;
+			mGraphView.mStop = true;
+			mSeekBar.setSelectedMaxValue(mSeekBar.getAbsoluteMaxValue());
+			mSeekBar.setSelectedMinValue(mSeekBar.getAbsoluteMinValue());
+			mNewData = new GestureElement();
+			mGraphView.Refresh();
+		}  	
+    };
+    
+    private OnDismissListener dissmissListener = new OnDismissListener() {
+		@Override
+		public void onDismiss(DialogInterface dialog) {
+			if (mNewData.Action.length() < 1) return;
+			
+			Toast.makeText(context, R.string.gesture_learn_processing, Toast.LENGTH_SHORT).show();
+		    if (GestureData.Instance().NeuralNetLearning(getApplicationContext(),mNewData)!=-1) {
+		    	Toast.makeText(context, R.string.gesture_learn_succeed, Toast.LENGTH_SHORT).show();
+		    } else {
+		    	Toast.makeText(context, R.string.gesture_learn_failed, Toast.LENGTH_SHORT).show();
+		    }
+	        mGraphView.mRecordedDataAcc.clear();
+			mGraphView.mRecordedDataOri.clear();
+			mGraphView.mEditMode = false;
+			mGraphView.mStop = true;
+			mSeekBar.setSelectedMaxValue(mSeekBar.getAbsoluteMaxValue());
+			mSeekBar.setSelectedMinValue(mSeekBar.getAbsoluteMinValue());
+			mNewData = new GestureElement();
+			mGraphView.Refresh();
+		}
+    };
+    
+    private OnClickListener submitBtnListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {		
+			List<Point3> RecordedDataAcc = 
+					 mGraphView.mRecordedDataAcc.subList(
+					(int)mSeekBar.getSelectedMinValue(),
+					Math.min(
+							(int)mSeekBar.getSelectedMaxValue(),
+							mGraphView.mRecordedDataAcc.size()));
+			List<Point2> RecordedDataOri = 
+					 mGraphView.mRecordedDataOri.subList(
+					(int)mSeekBar.getSelectedMinValue(),
+					Math.min(
+							(int)mSeekBar.getSelectedMaxValue(),
+							mGraphView.mRecordedDataOri.size()));
+			while (RecordedDataAcc.size() != 30) {
+				RecordedDataAcc.add(new Point3(0,0,0));
+			}
+			while (RecordedDataOri.size() != 30) {
+				RecordedDataOri.add(new Point2(0,0));
+			}
+			mNewData.PointsAcc.addAll(RecordedDataAcc);
+			mNewData.PointsOri.addAll(RecordedDataOri);
+			mNewData.Size = Math.min(mNewData.PointsAcc.size(), mNewData.PointsOri.size());
+			
+			gedlg = new GestureEditDialog(context, dissmissListener, mNewData);
+			gedlg.show();
+		}  	
+    };
 
     @Override
     protected void onResume() {
@@ -164,12 +161,5 @@ public class GestureLearningActivity extends Activity {
         startService(new Intent(this, GestureRecognizeService.class));
         super.onStop();
     }
-    
-    public native long NeuralNetLearning(GestureData gData, GestureElement newData);
-	public native long BoxCollisionLearning(GestureData gData, GestureElement newData);
-    
-    static {
-		System.loadLibrary("Snap");
-	}
-	
+
 }

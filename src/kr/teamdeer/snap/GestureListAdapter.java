@@ -12,11 +12,13 @@ import android.widget.TextView;
 public class GestureListAdapter extends BaseAdapter {
 	
 	private Activity activity;
-	private static LayoutInflater inflater;
+	private static LayoutInflater inflater = null;
 
 	public GestureListAdapter(Activity TargetActivity) {
 		activity = TargetActivity;
-		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		if (inflater == null) {
+			inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
 	}
 
 	@Override

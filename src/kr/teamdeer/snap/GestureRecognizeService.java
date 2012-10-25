@@ -1,5 +1,6 @@
 package kr.teamdeer.snap;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import android.app.Service;
@@ -25,16 +26,23 @@ public class GestureRecognizeService extends Service implements SensorEventListe
 	private Handler mHandler;
 	private WakeLock mWakeLock;
 	private SensorManager mSensorMgr;
+	public LinkedList<Point3> mRecordedDataAcc;
+	public LinkedList<Point2> mRecordedDataOri;
 	
 	@Override
 	public void onCreate() {
 		Log.d("GestureRecognizeService", "Service Created");
 		super.onCreate();
+		GestureData.Instance().load(getApplicationContext());
+		if (GestureData.Instance().getGestures().size() == 0)
+			stopSelf();
 		mHandler = new Handler();
 		mSensorMgr = (SensorManager)getSystemService(SENSOR_SERVICE);
 		PowerManager manager =
-	            (PowerManager) getSystemService(Context.POWER_SERVICE);
+	            (PowerManager)getSystemService(Context.POWER_SERVICE);
 		mWakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, this.getClass().getName());
+		mRecordedDataAcc = new LinkedList<Point3>();
+		mRecordedDataOri = new LinkedList<Point2>();
         this.registerReceiver(mReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
 	}
 	
@@ -52,36 +60,48 @@ public class GestureRecognizeService extends Service implements SensorEventListe
 		Log.d("GestureRecognizeService", "Service Started");
 		registerListener();
         mWakeLock.acquire();
-		mHandler.postDelayed(this, 300);
+		mHandler.postDelayed(this, 500);
 		return START_STICKY;
 	}
 	
 	public void run() {
-		//TODO
-		mHandler.postDelayed(this, 300);
+		int result;
+		GestureElement tmp = new GestureElement();
+		tmp.PointsAcc.addAll(mRecordedDataAcc);
+		tmp.PointsOri.addAll(mRecordedDataOri);
+		result = GestureData.Instance().NeuralNetRecognize(tmp);
+		if (result!=-1) {
+			mRecordedDataAcc.clear();
+			mRecordedDataOri.clear();
+			RunActivity(GestureData.Instance().getGesture(result).Action);
+		}
+		mHandler.postDelayed(this, 500);
 	}
 	
 	public void onSensorChanged(SensorEvent event) {
 		Log.d("GestureRecognizeService", "sensor: " + event.sensor + ", x: " + event.values[0] + ", y: " + event.values[1] + ", z: " + event.values[2]);
-        synchronized (this) { /*
-            if (mBitmap != null) {
-                final Canvas canvas = mCanvas;
-                final Paint paint = mPaint;
-                float newX = mLastX + mSpeed;
-                    
-                int j = (event.sensor.getType() == Sensor.TYPE_ORIENTATION) ? 1 : 0;
-                for (int i=0 ; i<3 ; i++) {
-                	int k = i+j*3;
-                    final float v = mYOffset + event.values[i] * ( j==1 ? 1 : mScale );
-                    paint.setColor(mColors[k]);
-                    canvas.drawLine(mLastX, mLastValues[k], newX, v, paint);
-                    mLastValues[k] = v;
-                }
-                    
-                if (event.sensor.getType() == Sensor.TYPE_ORIENTATION)
-                	mLastX += mSpeed;
-                invalidate();
-            } */
+        synchronized (this) {
+        	switch (event.sensor.getType()) {
+        	case Sensor.TYPE_ACCELEROMETER:
+        		Point3 tmp3 = new Point3();
+        		tmp3.x = event.values[0];
+        		tmp3.y = event.values[1];
+        		tmp3.z = event.values[2];
+        		mRecordedDataAcc.add(tmp3);
+        		if (mRecordedDataAcc.size() > 30) {
+            		mRecordedDataAcc.removeFirst();
+            	}
+        		break;
+        	case Sensor.TYPE_ORIENTATION:
+        		Point2 tmp2 = new Point2();
+        		tmp2.x = event.values[1];
+        		tmp2.y = event.values[2];
+        		mRecordedDataOri.add(tmp2);
+        		if (mRecordedDataOri.size() > 30) {
+        			mRecordedDataOri.removeFirst();
+            	}
+        		break;
+        	}       	
         }
 	}
 	
@@ -118,21 +138,24 @@ public class GestureRecognizeService extends Service implements SensorEventListe
         }
     };
 	
-	public void RunActivity(String pkgName, String name)
+	public void RunActivity(String Action)
 	{
 		final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         
         final PackageManager packageManager = getPackageManager();
         List<ResolveInfo> apps = packageManager.queryIntentActivities(mainIntent, 0);
+        String Actions[] = Action.split(",");
+        String pkgName = Actions[0];
+        String name = Actions[1];
         
         if (null != apps) {
          Log.d("ACTIVITY", "apps : " + apps.size());
          ResolveInfo info = null;
-         for (int i=0; i < apps.size(); i++) {
-        	 if ( (pkgName == apps.get(i).activityInfo.applicationInfo.packageName) &&
-        			 (name == apps.get(i).activityInfo.name)) {
-        		 info = apps.get(i);
+         for (ResolveInfo vr : apps) {
+        	 if ( pkgName.equals(vr.activityInfo.applicationInfo.packageName) &&
+        			 name.equals(vr.activityInfo.name)) {
+        		 info = vr;
         	 }
          }
          if (info == null) {
@@ -152,14 +175,7 @@ public class GestureRecognizeService extends Service implements SensorEventListe
             startActivity(intent);
         }
 	}
-	
-	public native long NeuralNetRecognize(GestureData gData, GestureElement recvData);
-	public native long BoxCollisionRecognize(GestureData gData, GestureElement recvData);
-	
-	static {
-		System.loadLibrary("Snap");
-	}
-		
+			
 	@Override
 	public IBinder onBind(Intent arg0) { return null; }
 	public void onAccuracyChanged(Sensor arg0, int arg1) {}

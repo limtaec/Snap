@@ -5,5 +5,13 @@
     <string name="setting">Snap Settings</string>
     <string name="text_empty"> </string>
     <string name="gesture_learn">Gesture Learning</string>
+    <string name="gesture_learn_reset">Reset</string>
+    <string name="gesture_learn_submit">Submit</string>
+    <string name="gesture_learn_processing">Processing…</string>
+    <string name="gesture_learn_succeed">Succeed</string>
+    <string name="gesture_learn_failed">Failed</string>
+    <string name="gesture_edit_dialog_name">Name</string>
+    <string name="gesture_edit_dialog_action">Action</string>
+    <string name="gesture_edit_dialog_Submit">Submit</string>
 
 </resources>
